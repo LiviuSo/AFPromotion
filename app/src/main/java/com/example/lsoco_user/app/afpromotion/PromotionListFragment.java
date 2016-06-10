@@ -12,6 +12,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,22 +29,16 @@ import java.util.ArrayList;
  */
 public class PromotionListFragment extends Fragment {
 
-    private ListView             mListView;
     private ArrayAdapter<String> mAdapter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_promotion_list, container, false);
-        mListView = (ListView) view.findViewById(R.id.listview_promotions);
-
-        // mock data
-        ArrayList<String> data = new ArrayList<>();
-        data.add("promotion 1");
-        data.add("promotion 2");
-        data.add("promotion 3");
+        ListView mListView = (ListView) view.findViewById(R.id.listview_promotions);
 
         // create and set the adapter
+        ArrayList<String> data = new ArrayList<>();
         mAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, data);
         mListView.setAdapter(mAdapter);
 
@@ -54,23 +52,40 @@ public class PromotionListFragment extends Fragment {
     /**
      * Downloads the feed
      */
-    private class FeedDownloader extends AsyncTask<Void, Void, Void> {
+    private class FeedDownloader extends AsyncTask<Void, Void, Promotion[]> {
 
         private final String LOG_TAG    = FeedDownloader.class.getSimpleName();
         private final String STRING_URL = "https://www.abercrombie.com/anf/nativeapp/Feeds/promotions.json";
 
         @Override
-        protected Void doInBackground(Void... params) {
-            downloadFeed();
+        protected Promotion[] doInBackground(Void... params) {
+            String jsonString = downloadFeed();
+            if(jsonString != null) {
+                return parseJson(jsonString);
+            }
             return null;
         }
 
-        private void downloadFeed() {
+        @Override
+        protected void onPostExecute(Promotion[] promotions) {
+            ArrayList<String> promotionsStringList = new ArrayList<>();
+            for(Promotion promotion : promotions) {
+               promotionsStringList.add(promotion.toString());
+            }
+            mAdapter.clear();
+            mAdapter.addAll(promotionsStringList);
+        }
+
+        /**
+         * Helper downloads the feed json
+         * @return json as string
+         */
+        private String downloadFeed() {
             // b/e
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             // will hold the feed as json
-            String jsonPromotions;
+            String jsonPromotions = null;
 
             try {
                 // create an url object
@@ -87,7 +102,7 @@ public class PromotionListFragment extends Fragment {
                 StringBuilder buffer = new StringBuilder();
 
                 if (inputStream == null) {
-                    return;
+                    return null;
                 }
 
                 // create the buffered reader
@@ -101,7 +116,7 @@ public class PromotionListFragment extends Fragment {
 
                 if (buffer.length() == 0) {
                     Log.v(LOG_TAG, "buffer empty");
-                    return;
+                    return null;
                 }
 
                 jsonPromotions = buffer.toString();
@@ -121,6 +136,37 @@ public class PromotionListFragment extends Fragment {
                     }
                 }
             }
+            return jsonPromotions;
+        }
+
+        /**
+         * Parses the json and return an array of Promotion objects
+         * @param stringJson The json
+         * @return The array of objects (Promotion)
+         */
+        private Promotion[] parseJson(String stringJson) {
+            Promotion[] promotions = null;
+            try {
+                JSONObject feed = new JSONObject(stringJson);
+                JSONArray promotionsArray = feed.getJSONArray("promotions");
+                int numPromos = promotionsArray.length();
+                promotions = new Promotion[numPromos];  // create the array that will hold the promotions
+                for(int i=0; i<numPromos;i++) {
+                    promotions[i] = new Promotion();
+                    JSONObject promotion = promotionsArray.getJSONObject(i);
+                    promotions[i].setTitle(promotion.getString("title"));
+                    promotions[i].setImage(promotion.getString("image"));
+                }
+
+                // test
+                for (Promotion promotion : promotions) {
+                    Log.v(LOG_TAG, promotion.toString());
+                }
+
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+            }
+            return promotions;
         }
     }
 }
