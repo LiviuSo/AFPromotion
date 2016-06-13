@@ -79,12 +79,12 @@ public class Promotion implements Parcelable {
 
     public String toStringDetails() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Image").append(image).append('\n')
-                .append("Title").append(title).append('\n')
-                .append("Description").append(description).append("\n\n")
-                .append("Button").append(button).append("\n\n");
+        stringBuilder.append("Image: ").append(image).append('\n')
+                .append("Title: ").append(title).append('\n')
+                .append("Description: ").append(description).append("\n\n")
+                .append(button).append("\n\n");
         if(footer != null) {
-            stringBuilder.append("Footer").append(footer);
+            stringBuilder.append("Footer: ").append(footer);
         }
         return stringBuilder.toString();
     }
