@@ -4,7 +4,6 @@ package com.example.lsoco_user.app.afpromotion;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,9 +22,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -37,93 +33,39 @@ import java.net.URL;
  */
 public class PromotionListFragment extends Fragment {
 
-    private static final String LOG_TAG        = PromotionListFragment.class.getSimpleName();
-    private static final String CACHE_FILENAME = "jsonCacheFile";
+    private static final String LOG_TAG = PromotionListFragment.class.getSimpleName();
     private PromotionAdapter mAdapter;
     private Promotion[]      promotions;
     private ListView         mListView;
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_promotion_list, container, false);
         mListView = (ListView) view.findViewById(R.id.listview_promotions);
         createOrUpdateAdapter();
 
         // check if there is cache
-        boolean hasCache = jsonWasCached();
+        boolean hasCache = CacheUtil.wasJsonCached(getActivity());
         if (hasCache) {
             // load from cache
-            String stringJson = loadJsonFromCache(CACHE_FILENAME);
+            String stringJson = CacheUtil.loadJsonFromCache(getActivity());
             // parse
             promotions = parseJson(stringJson);
             // load data
             populateListView();
-            Log.v(LOG_TAG, "loaded from cache");
-        } else {
-            // todo test if online
+            Log.v(LOG_TAG, "loaded from cache ???");
+        } else if(ConnectionUtil.isConnected(getActivity())) {
+            // online, but no cache
             // download data
-        FeedDownloader downloader = new FeedDownloader();
-        downloader.execute();
+            FeedDownloader downloader = new FeedDownloader();
+            downloader.execute();
+            Log.v(LOG_TAG, "downloaded");
+        } else {
+            // never
+            Log.e(LOG_TAG, "no cache and no connection");
         }
+
         return view;
-    }
-
-    /**
-     * Tests if the json has been cached locally
-     *
-     * @return True if the file has been cached
-     */
-    private boolean jsonWasCached() {
-        return true;
-    }
-
-    /**
-     * Saves the json to some local file
-     *
-     * @param filename The name of the file
-     * @param json     The json
-     */
-    private void saveJsonToCache(String filename, String json) {
-        File file = new File(getActivity().getCacheDir(), filename);
-        FileOutputStream outputStream;
-
-        try {
-            outputStream = new FileOutputStream(file);
-            outputStream.write(json.getBytes());
-            outputStream.close();
-            Log.v(LOG_TAG, "json cached successfully!");
-        } catch (Exception e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Load json from a local file
-     *
-     * @param filename The name of the local file
-     * @return The contents of the local file (the json)
-     */
-    private String loadJsonFromCache(String filename) {
-        //Get the text file
-        File file = new File(getActivity().getCacheDir(), filename);
-
-        //Read text from file
-        StringBuilder text = new StringBuilder();
-
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                text.append(line).append('\n');
-            }
-            br.close();
-        } catch (IOException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-        }
-
-        return text.toString();
     }
 
     /**
@@ -172,8 +114,7 @@ public class PromotionListFragment extends Fragment {
     private void createOrUpdateAdapter() {
         if (mAdapter == null) {
             mAdapter = new PromotionAdapter(getActivity());
-        }
-        else {
+        } else {
             mAdapter.clear();
             mAdapter.addAll(promotions);
         }
@@ -271,7 +212,8 @@ public class PromotionListFragment extends Fragment {
 
                 jsonPromotions = buffer.toString();
                 // cache
-                saveJsonToCache(CACHE_FILENAME, jsonPromotions);
+                CacheUtil.saveJsonToCache(getActivity(), jsonPromotions);
+                CacheUtil.markJsonWasCached(getActivity());
                 // test
                 Log.v(LOG_TAG, jsonPromotions);
             } catch (IOException e) {
@@ -306,7 +248,7 @@ public class PromotionListFragment extends Fragment {
 
         @Override
         public int getCount() {
-            if(promotions != null) {
+            if (promotions != null) {
                 return promotions.length;
             }
             return -1;

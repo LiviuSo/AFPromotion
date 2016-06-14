@@ -10,9 +10,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.main_frag_holder, new PromotionListFragment(), null)
-                .commit();
+        if(CacheUtil.wasJsonCached(this) || ConnectionUtil.isConnected(this)) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.main_frag_holder, new PromotionListFragment(), null)
+                    .commit();
+        } else { // no cache and no connection
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.main_frag_holder, new BlankFragment(), null)
+                    .commit();
+        }
     }
 }
