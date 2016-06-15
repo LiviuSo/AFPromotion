@@ -1,5 +1,7 @@
 package com.example.lsoco_user.app.afpromotion.fragment;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -8,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.lsoco_user.app.afpromotion.util.Constants;
@@ -20,6 +23,7 @@ import com.squareup.picasso.Picasso;
  */
 public class PromotionDetailFragment extends Fragment {
 
+    @TargetApi(Build.VERSION_CODES.M)
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,8 +44,13 @@ public class PromotionDetailFragment extends Fragment {
             descr.setText(promotion.getDescription());
 
             if(promotion.getFooter() != null) {
+                // if there is a footer, set the set footer background
+                LinearLayout llFooter = (LinearLayout)view.findViewById(R.id.frag_detail_footer);
+                llFooter.setBackgroundColor(getResources().getColor(R.color.footerBckgColor));
+                // set footer content
                 TextView footerContent = (TextView) view.findViewById(R.id.frag_detail_footer_content);
                 footerContent.setText(promotion.getFooterContent());
+                // set the link
                 TextView footerLink = (TextView) view.findViewById(R.id.frag_detail_footer_link);
                 footerLink.setText(promotion.getFooterLinkText());
                 footerLink.setOnClickListener(new View.OnClickListener() {
@@ -50,7 +59,6 @@ public class PromotionDetailFragment extends Fragment {
                         launchWebViewFragment(promotion.getFooterWebLink());
                     }
                 });
-
             }
 
             Button button = (Button) view.findViewById(R.id.frag_detail_button);
