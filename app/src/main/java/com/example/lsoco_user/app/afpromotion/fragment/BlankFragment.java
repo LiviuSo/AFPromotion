@@ -29,7 +29,6 @@ public class BlankFragment extends Fragment {
                     // swap with PromotionListFragment
                     getFragmentManager().beginTransaction()
                             .replace(R.id.main_frag_holder, new PromotionListFragment())
-                            .addToBackStack(null)
                             .commit();
                 }
             }

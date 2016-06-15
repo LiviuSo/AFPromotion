@@ -4,6 +4,7 @@ package com.example.lsoco_user.app.afpromotion.fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -44,8 +45,16 @@ public class PromotionListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_promotion_list, container, false);
-//        mListView = (ListView) view.findViewById(R.id.listview_promotions);
-//        createOrUpdateAdapter();
+
+        // setup the SwipeRefresh listener
+        final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout)view;
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                populateListView();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
 
         // setup the RecyclerView
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_promo);
