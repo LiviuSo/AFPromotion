@@ -1,18 +1,16 @@
 package com.example.lsoco_user.app.afpromotion.fragment;
 
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.lsoco_user.app.afpromotion.util.CacheUtil;
@@ -39,17 +37,26 @@ import java.net.URL;
 public class PromotionListFragment extends Fragment {
 
     private static final String LOG_TAG = PromotionListFragment.class.getSimpleName();
-    private PromotionAdapter mAdapter;
-    private Promotion[]      promotions;
-    private ListView         mListView;
+    private Promotion[]        promotions;
+    private RecyclerView       mRecyclerView;
+    private PromotionAdapterRV mAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_promotion_list, container, false);
-        mListView = (ListView) view.findViewById(R.id.listview_promotions);
-        createOrUpdateAdapter();
+//        mListView = (ListView) view.findViewById(R.id.listview_promotions);
+//        createOrUpdateAdapter();
 
-        // check if there is cache
+        // setup the RecyclerView
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_promo);
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        mRecyclerView.setHasFixedSize(true);
+        // use a linear layout manager
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        // fetch the data; check if there is cache
         boolean hasCache = CacheUtil.wasJsonCached(getActivity());
         if (hasCache) {
             // load from cache
@@ -68,6 +75,10 @@ public class PromotionListFragment extends Fragment {
             // never
             Log.e(LOG_TAG, Constants.STRING_LOG_NO_CACHE_CONN);
         }
+
+        // specify an adapter (see also next example)
+//        mRecyclerView.setAdapter(mAdapter);
+
         return view;
     }
 
@@ -113,45 +124,22 @@ public class PromotionListFragment extends Fragment {
         return promotionsArray;
     }
 
-
-    private void createOrUpdateAdapter() {
-        if (mAdapter == null) {
-            mAdapter = new PromotionAdapter(getActivity());
-        } else {
-            mAdapter.clear();
-            mAdapter.addAll(promotions);
-        }
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.v(LOG_TAG, "clicked " + position);
-                PromotionDetailFragment fragment = new PromotionDetailFragment();
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(Constants.KEY_SELECTED_ITEM, promotions[position]);
-                fragment.setArguments(bundle);
-                getFragmentManager().beginTransaction()
-                        .replace(R.id.main_frag_holder, fragment, null)
-                        .addToBackStack(null)
-                        .commit();
-            }
-        });
-    }
-
     /**
      * Populates the list view with the promotion
      */
     private void populateListView() {
-        createOrUpdateAdapter();
+        if (mAdapter == null) {
+            mAdapter = new PromotionAdapterRV();
+        }
+        mRecyclerView.setAdapter(mAdapter);
     }
-
 
     /**
      * Downloads the feed
      */
     private class FeedDownloader extends AsyncTask<Void, Void, Promotion[]> {
 
-        private final String LOG_TAG    = FeedDownloader.class.getSimpleName();
+        private final String LOG_TAG = FeedDownloader.class.getSimpleName();
 
         @Override
         protected Promotion[] doInBackground(Void... params) {
@@ -237,42 +225,63 @@ public class PromotionListFragment extends Fragment {
     }
 
     /**
-     * ArrayAdapter for Promotion objects
+     * RecyclerView Adapter to Promotion for Promotion objects
      */
-    private class PromotionAdapter extends ArrayAdapter<Promotion> {
+    private class PromotionAdapterRV extends RecyclerView.Adapter<PromotionViewHolder> {
 
-        private Context context;
-
-        public PromotionAdapter(Context context) {
-            super(context, R.layout.promo_item);
-            this.context = context;
+        @Override
+        public PromotionViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(getActivity()).inflate(R.layout.promo_item, parent, false);
+            return new PromotionViewHolder(view);
         }
 
         @Override
-        public int getCount() {
-            if (promotions != null) {
-                return promotions.length;
-            }
-            return -1;
+        public void onBindViewHolder(PromotionViewHolder holder, int position) {
+            Promotion promotion = promotions[position];
+            holder.bindData(promotion);
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            LayoutInflater inflater = (LayoutInflater) context
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View view = inflater.inflate(R.layout.promo_item, parent, false);
-            if (promotions != null && getCount() > 0) {
-                TextView textView = (TextView) view.findViewById(R.id.textView_title);
-                textView.setText(promotions[position].getTitle());
-                // set the image
-                ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
-                Picasso.with(context)
-                        .load(promotions[position].getImage())
-                        .placeholder(R.drawable.placeholder)
-                        .error(R.drawable.placeholder)
-                        .into(imageView);
-            }
-            return view;
+        public int getItemCount() {
+            return promotions.length;
+        }
+    }
+
+    /**
+     * ViewHolder for Promotion objects
+     */
+    private class PromotionViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        ImageView imageView;
+        TextView  textView;
+
+        public PromotionViewHolder(View itemView) {
+            super(itemView);
+            imageView = (ImageView) itemView.findViewById(R.id.imageView);
+            textView = (TextView) itemView.findViewById(R.id.textView_title);
+            itemView.setOnClickListener(this);
+        }
+
+        public void bindData(Promotion promotion) {
+            textView.setText(promotion.getTitle());
+            Picasso.with(getActivity())
+                    .load(promotion.getImage())
+                    .placeholder(R.drawable.placeholder)
+                    .error(R.drawable.placeholder)
+                    .into(imageView);
+
+        }
+
+        @Override
+        public void onClick(View v) {
+            PromotionDetailFragment fragment = new PromotionDetailFragment();
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(Constants.KEY_SELECTED_ITEM, promotions[getAdapterPosition()]);
+            fragment.setArguments(bundle);
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.main_frag_holder, fragment, null)
+                    .addToBackStack(null)
+                    .commit();
         }
     }
 }

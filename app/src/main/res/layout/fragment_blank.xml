@@ -20,7 +20,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="@string/you_are_offline"
-            android:textColor="#64151111"
+            android:textColor="@color/offlineMsgColor"
             android:textSize="20sp"/>
 
         <TextView
@@ -29,7 +29,7 @@
             android:layout_weight="3"
             android:gravity="center"
             android:text="@string/offline_instructions"
-            android:textColor="#64121010"
+            android:textColor="@color/offlineInstrColor"
             android:textSize="28sp"/>
 
     </LinearLayout>
