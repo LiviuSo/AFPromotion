@@ -1,7 +1,9 @@
-package com.example.lsoco_user.app.afpromotion;
+package com.example.lsoco_user.app.afpromotion.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.example.lsoco_user.app.afpromotion.util.HtmlLinkExtractor;
 
 import java.util.Vector;
 
@@ -101,23 +103,9 @@ public class Promotion implements Parcelable {
         this.button = button;
     }
 
-    public String toStringDetails() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Image: ").append(image).append('\n')
-                .append("Title: ").append(title).append('\n')
-                .append("Description: ").append(description).append("\n\n")
-                .append(button).append("\n\n");
-        if (footer != null) {
-            stringBuilder.append("Footer: ").append(footer);
-        }
-        return stringBuilder.toString();
-    }
-
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Title: ").append(title).append('\n').append("Image: ").append(image);
-        return stringBuilder.toString();
+        return "Title: " + title + '\n' + "Image: " + image;
     }
 
     @Override

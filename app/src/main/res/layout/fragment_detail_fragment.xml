@@ -9,7 +9,7 @@
     <LinearLayout
         android:id="@+id/frag_detail"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="10dp"
         android:weightSum="12">
@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="5"
-            android:contentDescription="promo image"
+            android:contentDescription="@string/promo_image"
             android:src="@drawable/placeholder"/>
 
         <TextView

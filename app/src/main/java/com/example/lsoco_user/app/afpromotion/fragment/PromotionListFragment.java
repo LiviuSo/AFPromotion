@@ -1,4 +1,4 @@
-package com.example.lsoco_user.app.afpromotion;
+package com.example.lsoco_user.app.afpromotion.fragment;
 
 
 import android.content.Context;
@@ -15,6 +15,11 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.lsoco_user.app.afpromotion.util.CacheUtil;
+import com.example.lsoco_user.app.afpromotion.util.ConnectionUtil;
+import com.example.lsoco_user.app.afpromotion.util.Constants;
+import com.example.lsoco_user.app.afpromotion.model.Promotion;
+import com.example.lsoco_user.app.afpromotion.R;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -53,18 +58,16 @@ public class PromotionListFragment extends Fragment {
             promotions = parseJson(stringJson);
             // load data
             populateListView();
-            Log.v(LOG_TAG, "loaded from cache");
+            Log.v(LOG_TAG, Constants.STRING_LOG_LOAD_CACHE);
         } else if (ConnectionUtil.isConnected(getActivity())) {
-            // online, but no cache
-            // download data
+            // online, but no cache -> download data
             FeedDownloader downloader = new FeedDownloader();
             downloader.execute();
-            Log.v(LOG_TAG, "downloaded");
+            Log.v(LOG_TAG, Constants.STRING_LOG_DOWNLOADED);
         } else {
             // never
-            Log.e(LOG_TAG, "no cache and no connection");
+            Log.e(LOG_TAG, Constants.STRING_LOG_NO_CACHE_CONN);
         }
-
         return view;
     }
 
@@ -125,7 +128,7 @@ public class PromotionListFragment extends Fragment {
                 Log.v(LOG_TAG, "clicked " + position);
                 PromotionDetailFragment fragment = new PromotionDetailFragment();
                 Bundle bundle = new Bundle();
-                bundle.putParcelable("selected_item", promotions[position]);
+                bundle.putParcelable(Constants.KEY_SELECTED_ITEM, promotions[position]);
                 fragment.setArguments(bundle);
                 getFragmentManager().beginTransaction()
                         .replace(R.id.main_frag_holder, fragment, null)
@@ -149,7 +152,6 @@ public class PromotionListFragment extends Fragment {
     private class FeedDownloader extends AsyncTask<Void, Void, Promotion[]> {
 
         private final String LOG_TAG    = FeedDownloader.class.getSimpleName();
-        private final String STRING_URL = "https://www.abercrombie.com/anf/nativeapp/Feeds/promotions.json";
 
         @Override
         protected Promotion[] doInBackground(Void... params) {
@@ -180,7 +182,7 @@ public class PromotionListFragment extends Fragment {
 
             try {
                 // create an url object
-                URL url = new URL(STRING_URL);
+                URL url = new URL(Constants.STRING_URL);
                 // open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setReadTimeout(10000 /* milliseconds */);
@@ -206,7 +208,7 @@ public class PromotionListFragment extends Fragment {
                 }
 
                 if (buffer.length() == 0) {
-                    Log.v(LOG_TAG, "buffer empty");
+                    Log.v(LOG_TAG, Constants.STRING_LOG_BUFFER_EMPTY);
                     return null;
                 }
 
@@ -226,7 +228,7 @@ public class PromotionListFragment extends Fragment {
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error closing stream", e);
+                        Log.e(LOG_TAG, e.getMessage(), e);
                     }
                 }
             }

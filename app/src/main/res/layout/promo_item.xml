@@ -7,7 +7,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Title"
+        android:text="@string/title"
         android:id="@+id/textView_title"
         android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal"
@@ -20,5 +20,6 @@
         android:layout_gravity="center_horizontal"
         android:src="@drawable/placeholder"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp"/>
+        android:paddingRight="10dp"
+        android:contentDescription="@string/image"/>
 </LinearLayout>

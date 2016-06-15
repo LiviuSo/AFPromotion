@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">AFPromotion</string>
+    <string name="title">Title</string>
+    <string name="image">image</string>
+    <string name="promo_image">promo image</string>
+    <string name="you_are_offline">You are offline</string>
+    <string name="offline_instructions">Connect \n\n and \n\n swipe to refresh</string>
 </resources>

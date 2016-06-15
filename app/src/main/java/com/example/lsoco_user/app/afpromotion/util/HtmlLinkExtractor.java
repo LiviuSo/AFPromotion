@@ -1,4 +1,4 @@
-package com.example.lsoco_user.app.afpromotion;
+package com.example.lsoco_user.app.afpromotion.util;
 
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 public class HtmlLinkExtractor {
 
     private Pattern patternTag, patternLink;
-    private Matcher matcherTag, matcherLink;
 
     private static final String HTML_A_TAG_PATTERN      = "(?i)<a([^>]+)>(.+?)</a>";
     private static final String HTML_A_HREF_TAG_PATTERN =
@@ -33,6 +32,7 @@ public class HtmlLinkExtractor {
 
         Vector<HtmlLink> result = new Vector<>();
 
+        Matcher matcherTag;
         matcherTag = patternTag.matcher(html);
 
         while (matcherTag.find()) {
@@ -40,7 +40,7 @@ public class HtmlLinkExtractor {
             String href = matcherTag.group(1); // href
             String linkText = matcherTag.group(2); // link text
 
-            matcherLink = patternLink.matcher(href);
+            Matcher matcherLink = patternLink.matcher(href);
 
             while (matcherLink.find()) {
 

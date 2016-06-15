@@ -1,4 +1,4 @@
-package com.example.lsoco_user.app.afpromotion;
+package com.example.lsoco_user.app.afpromotion.util;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

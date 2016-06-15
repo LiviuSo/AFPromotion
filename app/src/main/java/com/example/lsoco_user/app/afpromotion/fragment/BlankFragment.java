@@ -1,22 +1,21 @@
-package com.example.lsoco_user.app.afpromotion;
+package com.example.lsoco_user.app.afpromotion.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+
+import com.example.lsoco_user.app.afpromotion.util.ConnectionUtil;
+import com.example.lsoco_user.app.afpromotion.R;
 
 /**
  * Fragment with some text launched when the app is run for the first time
  * and there is no connection
  */
 public class BlankFragment extends Fragment {
-
-    private static final String LOG_TAG = BlankFragment.class.getSimpleName();
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -25,7 +24,6 @@ public class BlankFragment extends Fragment {
         ll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.v(LOG_TAG, "clicked");
                 // test if connection
                 if (ConnectionUtil.isConnected(getActivity())) {
                     // swap with PromotionListFragment

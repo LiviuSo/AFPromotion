@@ -1,7 +1,13 @@
-package com.example.lsoco_user.app.afpromotion;
+package com.example.lsoco_user.app.afpromotion.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.example.lsoco_user.app.afpromotion.util.CacheUtil;
+import com.example.lsoco_user.app.afpromotion.util.ConnectionUtil;
+import com.example.lsoco_user.app.afpromotion.R;
+import com.example.lsoco_user.app.afpromotion.fragment.BlankFragment;
+import com.example.lsoco_user.app.afpromotion.fragment.PromotionListFragment;
 
 public class MainActivity extends AppCompatActivity {
 

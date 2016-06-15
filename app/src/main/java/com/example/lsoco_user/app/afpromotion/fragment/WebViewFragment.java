@@ -1,4 +1,4 @@
-package com.example.lsoco_user.app.afpromotion;
+package com.example.lsoco_user.app.afpromotion.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.example.lsoco_user.app.afpromotion.util.Constants;
+import com.example.lsoco_user.app.afpromotion.R;
+
 /**
  * Simple fragment holding a web-view
  */
@@ -18,7 +21,7 @@ public class WebViewFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         WebView webView =  (WebView) inflater.inflate(R.layout.fragment_webview, container, false);
-        String url = getArguments().getString("url");
+        String url = getArguments().getString(Constants.KEY_URL);
         webView.setWebViewClient(new WebViewController());
         webView.loadUrl(url);
         return webView;

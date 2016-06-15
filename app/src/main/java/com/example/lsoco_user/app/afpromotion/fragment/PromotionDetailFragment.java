@@ -1,20 +1,18 @@
-package com.example.lsoco_user.app.afpromotion;
+package com.example.lsoco_user.app.afpromotion.fragment;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.lsoco_user.app.afpromotion.util.Constants;
+import com.example.lsoco_user.app.afpromotion.model.Promotion;
+import com.example.lsoco_user.app.afpromotion.R;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -26,7 +24,7 @@ public class PromotionDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail_fragment, container, false);
-        final Promotion promotion = getArguments().getParcelable("selected_item");
+        final Promotion promotion = getArguments().getParcelable(Constants.KEY_SELECTED_ITEM);
         if(promotion != null) {
             ImageView image = (ImageView) view.findViewById(R.id.frag_detail_image);
             Picasso.with(getActivity())
@@ -49,14 +47,7 @@ public class PromotionDetailFragment extends Fragment {
                 footerLink.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        WebViewFragment fragment = new WebViewFragment();
-                        Bundle bundle = new Bundle();
-                        bundle.putString("url", promotion.getFooterWebLink());
-                        fragment.setArguments(bundle);
-                        getFragmentManager().beginTransaction()
-                                .replace(R.id.main_frag_holder, fragment)
-                                .addToBackStack(null)
-                                .commit();
+                        launchWebViewFragment(promotion.getFooterWebLink());
                     }
                 });
 
@@ -64,7 +55,24 @@ public class PromotionDetailFragment extends Fragment {
 
             Button button = (Button) view.findViewById(R.id.frag_detail_button);
             button.setText(promotion.getButton().getTitle());
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    launchWebViewFragment(promotion.getButton().getTarget());
+                }
+            });
         }
         return view;
+    }
+
+    private void launchWebViewFragment(String url) {
+        WebViewFragment fragment = new WebViewFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(Constants.KEY_URL, url);
+        fragment.setArguments(bundle);
+        getFragmentManager().beginTransaction()
+                .replace(R.id.main_frag_holder, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 }
