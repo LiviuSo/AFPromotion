@@ -53,8 +53,8 @@ public class PromotionListFragment extends Fragment {
             promotions = parseJson(stringJson);
             // load data
             populateListView();
-            Log.v(LOG_TAG, "loaded from cache ???");
-        } else if(ConnectionUtil.isConnected(getActivity())) {
+            Log.v(LOG_TAG, "loaded from cache");
+        } else if (ConnectionUtil.isConnected(getActivity())) {
             // online, but no cache
             // download data
             FeedDownloader downloader = new FeedDownloader();

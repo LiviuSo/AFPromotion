@@ -3,18 +3,22 @@ package com.example.lsoco_user.app.afpromotion;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Vector;
+
 /**
  * Model to hold the promotion feed
  */
 public class Promotion implements Parcelable {
-    private String title;
-    private String image;
-    private String description;
-    private String footer;
-    private PromotionButton button;
+
+    private String            title;
+    private String            image;
+    private String            description;
+    private String            footer;
+    private PromotionButton   button;
+    private HtmlLinkExtractor htmlExtr;
 
     public Promotion() {
-
+        htmlExtr = new HtmlLinkExtractor();
     }
 
     protected Promotion(Parcel in) {
@@ -65,6 +69,26 @@ public class Promotion implements Parcelable {
         return footer;
     }
 
+    public String getFooterContent() {
+        int indexStartLink = footer.indexOf('<');
+        return footer.substring(0, indexStartLink);
+    }
+
+    public String getFooterLink() {
+        int indexStartLink = footer.indexOf('<');
+        return footer.substring(indexStartLink, footer.length());
+    }
+
+    public String getFooterLinkText() {
+        Vector<HtmlLinkExtractor.HtmlLink> links = htmlExtr.grabHTMLLinks(getFooterLink());
+        return links.get(0).getLinkText();
+    }
+
+    public String getFooterWebLink() {
+        Vector<HtmlLinkExtractor.HtmlLink> links = htmlExtr.grabHTMLLinks(getFooterLink());
+        return links.get(0).getLink();
+    }
+
     public void setFooter(String footer) {
         this.footer = footer;
     }
@@ -83,7 +107,7 @@ public class Promotion implements Parcelable {
                 .append("Title: ").append(title).append('\n')
                 .append("Description: ").append(description).append("\n\n")
                 .append(button).append("\n\n");
-        if(footer != null) {
+        if (footer != null) {
             stringBuilder.append("Footer: ").append(footer);
         }
         return stringBuilder.toString();
@@ -110,9 +134,11 @@ public class Promotion implements Parcelable {
         dest.writeParcelable(button, flags);
     }
 
-    // parcelable side
-
+    /**
+     * Promotion button; has a title and a target (a web-link)
+     */
     public static class PromotionButton implements Parcelable {
+
         private String target;
         private String title;
 
