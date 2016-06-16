@@ -8,13 +8,13 @@
 
     <LinearLayout
         android:id="@+id/frag_blank_ll"
-
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true"
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/frag_blank_tv_msg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -24,6 +24,7 @@
             android:textSize="20sp"/>
 
         <TextView
+            android:id="@+id/frag_blank_tv_instr"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="3"

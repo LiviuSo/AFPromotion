@@ -4,6 +4,7 @@ package com.example.lsoco_user.app.afpromotion.fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -289,6 +290,7 @@ public class PromotionListFragment extends Fragment {
             fragment.setArguments(bundle);
             getFragmentManager().beginTransaction()
                     .replace(R.id.main_frag_holder, fragment, null)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                     .addToBackStack(null)
                     .commit();
         }
